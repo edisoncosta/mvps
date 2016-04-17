@@ -1,0 +1,557 @@
+#!/bin/bash
+# ============== INFO SCRIPT =============
+version="3.0"
+changelog="Mayor update, add more task and feature"
+urlscript="https://raw.githubusercontent.com/idL3akZ/mvps/master/mvps"
+ver=$(wget -qO- --no-check-certificate $urlscript | sed '3!d' | awk -F'"' '$0=$2')
+vlog=$(wget -qO- --no-check-certificate $urlscript | sed '4!d' | awk -F'"' '$0=$2')
+# ========================================
+if [ "$version" != "$ver" ]
+	then
+		clear
+		echo -e "\e[40;38;5;82m.::::::::::::::::::-------- \e[30;48;5;82m mVPS v.$version \e[0m \e[40;38;5;82m-------:::::::::::::::::.\e[0m"
+		echo -e "\e[40;38;5;82m------------------------------------------------------------------\e[0m"
+		echo -e "\e[40;38;5;82mBash VPS Wordpress Management, dengan mesin EasyEngine dan WP-CLI\e[0m"
+		echo "------------------------------------------------------------------"
+		echo -e "Your script \e[30;48;5;82m mVPS v.$version \e[0m is an old version"
+		echo -e "New Version is available : Script \e[30;48;5;82m mVPS v.$ver \e[0m"
+		echo -e "\e[7;49;96mKeterangan : $vlog \e[0m"
+		echo -n -e "Update Script to \e[30;48;5;82m mVPS v.$ver \e[0m ? [y or n] : "
+		read update
+			case $update in
+				[yY] )
+					[ -f /usr/local/bin/mvps ] && rm -rf /usr/local/bin/mvps
+					wget --no-check-certificate -O /usr/local/bin/mvps $urlscript && chmod +x /usr/local/bin/mvps
+					echo -e "###### \e[30;48;5;82m mVPS v.$ver \e[0m ##### ---- Update Success, re-run mVPS ..."
+					sleep 3s
+					mvps
+					;;
+				*)
+					clear
+					echo -e "\e[40;38;5;82m.::::::::::::::::::-------- \e[30;48;5;82m mVPS v.$version \e[0m \e[40;38;5;82m-------:::::::::::::::::.\e[0m"
+					echo -e "\e[40;38;5;82m------------------------------------------------------------------\e[0m"
+					echo -e "\e[40;38;5;82mBash VPS Wordpress Management, dengan mesin EasyEngine dan WP-CLI\e[0m"
+					echo -e "\e[40;38;5;82m======================= T A S K - L I S T ========================\e[0m"
+					echo "1. Software Installation (EasyEngine, WP-CLI, phpmyadmin, dll)"
+					echo "------------------------------------------------------------------"
+					echo "2. Wordpress Installation + Default Configuration"
+					echo "3. Lihat daftar WP domain Master"
+					echo "4. Hapus domain Master"
+					echo "5. Tambah domain layer"
+					echo "6. Lihat daftar domain layer"
+					echo "7. Hapus domain layer"
+					echo "8. Cronjob - Log/info cache VM-AGC"
+					echo "------------------------------------------------------------------"
+					echo "9. Lihat Account PhpMyAdmin"
+					echo "10. Ubah Default WP User Account"
+					echo "11. Ubah ExclusiveBot User Account"
+					echo "12. Lihat Change Log mVPS"
+					echo ""
+					echo -n "Silahkan pilih Tasknya [1-12] : "
+					read task
+					;;
+			esac
+	else
+		clear
+		echo -e "\e[40;38;5;82m.::::::::::::::::::-------- \e[30;48;5;82m mVPS v.$version \e[0m \e[40;38;5;82m-------:::::::::::::::::.\e[0m"
+		echo -e "\e[40;38;5;82m------------------------------------------------------------------\e[0m"
+		echo -e "\e[40;38;5;82mBash VPS Wordpress Management, dengan mesin EasyEngine dan WP-CLI\e[0m"
+		echo -e "\e[40;38;5;82m======================= T A S K - L I S T ========================\e[0m"
+		echo "1. Software Installation (EasyEngine, WP-CLI, phpmyadmin, dll)"
+		echo "------------------------------------------------------------------"
+		echo "2. Wordpress Installation + Default Configuration"
+		echo "3. Lihat daftar WP domain Master"
+		echo "4. Hapus domain Master"
+		echo "5. Tambah domain layer"
+		echo "6. Lihat daftar domain layer"
+		echo "7. Hapus domain layer"
+		echo "8. Cronjob - Log/info cache VM-AGC"
+		echo "------------------------------------------------------------------"
+		echo "9. Lihat Account PhpMyAdmin"
+		echo "10. Ubah Default WP User Account"
+		echo "11. Ubah ExclusiveBot User Account"
+		echo "12. Lihat Change Log mVPS"
+		echo ""
+		echo -n "Silahkan pilih Tasknya [1-12] : "
+		read task
+fi
+	case $task in
+		1 )
+			clear
+			echo -e "\e[40;38;5;82m.::::::::::::::::::-------- \e[30;48;5;82m mVPS v.$version \e[0m \e[40;38;5;82m-------:::::::::::::::::.\e[0m"
+			echo -e "\e[40;38;5;82m------------------------------------------------------------------\e[0m"
+			echo -e "\e[40;38;5;82mBash VPS Wordpress Management, dengan mesin EasyEngine dan WP-CLI\e[0m"
+			echo -e "\e[40;38;5;82m======================= T A S K - L I S T ========================\e[0m"
+			echo "1. Software Installation (EasyEngine, WP-CLI, phpmyadmin, dll)"
+			echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Update repositories ..."
+			sleep 3s
+			apt-get update
+			echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Update system ..."
+			sleep 3s
+			apt-get upgrade -y
+			tapache2=$(which apache2)
+			if [ $tapache2 != "" ]
+				then
+					echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Paket apache2 ditemukan, menghapus apache2 ..."
+					sleep 2s
+					service apache2 stop
+					apt-get purge apache2 apache2-utils apache2.2-bin apache2-common -y
+					apt-get autoremove -y
+					rm -rf /etc/apache2
+			fi
+			echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Install EasyEngine ..."
+			sleep 3s
+			wget -qO ee rt.cx/ee && sudo bash ee
+			echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Install EasyEngine stack ..."
+			sleep 3s
+			sudo ee stack install
+			echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Change User Auth for access EasyEngine stack ..."
+			sleep 3s
+			sudo ee secure --auth
+			echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Rubah default user account WP ? [y or n] : "
+			read dwp
+				case $dwp in
+					[yY] )
+						echo -n "Username : "
+						read EEUsernameIsi
+						echo -n "Password : "
+						read EEPasswordIsi
+						echo -n "E-mail : "
+						read EEEmailIsi
+						echo ""
+						echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Saving Default WP Account ..."
+						sleep 2s
+						sed -i "63d" /etc/ee/ee.conf
+						sed -i "63i user = $EEUsernameIsi" /etc/ee/ee.conf
+						sed -i "66d" /etc/ee/ee.conf
+						sed -i "66i password = $EEPasswordIsi" /etc/ee/ee.conf
+						sed -i "69d" /etc/ee/ee.conf
+						sed -i "69i email = $EEEmailIsi" /etc/ee/ee.conf
+						;;
+					*)	echo "rubah default user account WP dilewati ..."
+						;;
+				esac
+			echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Installing nano (text editor)..."
+			sleep 3s
+			apt-get install nano -y
+			echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Installing Fail2Ban (Prevented from brute force ssh access)..."
+			sleep 3s
+			apt-get install fail2ban -y
+			echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m Software Installation (EasyEngine, WP-CLI, phpmyadmin, dll) complete ..."
+			sleep 5s
+			mvps
+			;;
+		2 )
+			clear
+			echo -e "\e[40;38;5;82m.::::::::::::::::::-------- \e[30;48;5;82m mVPS v.$version \e[0m \e[40;38;5;82m-------:::::::::::::::::.\e[0m"
+			echo -e "\e[40;38;5;82m------------------------------------------------------------------\e[0m"
+			echo -e "\e[40;38;5;82mBash VPS Wordpress Management, dengan mesin EasyEngine dan WP-CLI\e[0m"
+			echo -e "\e[40;38;5;82m======================= T A S K - L I S T ========================\e[0m"
+			echo "2. Wordpress Installation + Default Configuration"
+			[ ! -d /etc/mvps ] && mkdir /etc/mvps
+			echo -n "Isi nama domain : "
+			read domain
+			echo -n "Blog Name : "
+			read blogname
+			echo -n "Blog Description : "
+			read blogdescription
+			echo -n "Email admin : "
+			read admin_email
+			echo -n "CustomSlug VM-AGC (tanpa spasi/gunakan -) : "
+			read customslug
+			if [ ! -f /etc/mvps/mvps.conf ]
+				then
+				echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Isi ExclusiveBot accout ..."
+				echo -n "Username : "
+				read EBUsernameIsi
+				echo -n "Password : "
+				read EBPasswordIsi
+				echo -n "E-mail : "
+				read EBEmailIsi
+				echo ""
+				echo -n "Simpan akun ? [y or n] : "
+				read saveEB
+					case $saveEB in
+						[yY] )
+							echo -e "[ ExclusiveBot User Account ]\n\nusername = default\nemail = default\npassword = default" > /etc/mvps/mvps.conf
+							echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Saving ExclusiveBot user Account ..."
+							sleep 2s
+							sed -i "3d" /etc/mvps/mvps.conf
+							sed -i "3i username = $EBUsernameIsi" /etc/mvps/mvps.conf
+							sed -i "4d" /etc/mvps/mvps.conf
+							sed -i "4i password = $EBPasswordIsi" /etc/mvps/mvps.conf
+							sed -i "5d" /etc/mvps/mvps.conf
+							sed -i "5i email = $EBEmailIsi" /etc/mvps/mvps.conf
+							echo "------------------------------------------------------------------"
+							echo "mVPS config file here : /etc/mvps/"
+							;;
+
+						*) echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Penyimpanan dilewati ..."
+							;;
+					esac
+				else
+				EBUsernameIsi=$(sed '3!d' /etc/mvps/mvps.conf | awk -F' ' '$0=$3')
+				EBPasswordIsi=$(sed '4!d' /etc/mvps/mvps.conf | awk -F' ' '$0=$3')
+				EBEmailIsi=$(sed '5!d' /etc/mvps/mvps.conf | awk -F' ' '$0=$3')
+			fi
+			ee site create $domain --wp
+			echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Creating domain master log ..."
+			sleep 3s
+			echo -e "$domain" >> /etc/mvps/domainMaster.log
+			echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Getting VM-AGC v3 License ..."
+			sleep 3s
+			license=$(curl "http://license.exclusivebot.net/VMAgcV3Gen.php?domain=$domain&us=$EBUsernameIsi&p=$EBPasswordIsi&email=$EBEmailIsi")
+			echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Setting MY default WP ...."
+			sleep 3s
+			workdir="--path=/var/www/$domain/htdocs"
+			sudo -u www-data -s -- <<-EOF
+			wp $workdir core update
+			wp $workdir plugin update --all
+			wp $workdir theme update --all
+			wp $workdir plugin install disable-comments --activate
+			wp $workdir plugin install social-locker
+			wp $workdir plugin install http://safelinkconverter.com/wp-content/uploads/2015/09/SafeLinkConverter-CPM-Plugin.zip --activate
+			wp $workdir plugin install google-sitemap-generator --activate
+			wp $workdir plugin install http://server.sonaji.net/stt.zip --activate
+			wp $workdir plugin install http://server.sonaji.net/wpfresh.zip --activate
+			wp $workdir plugin install http://server.sonaji.net/vm-ajax.zip
+			mv /var/www/$domain/htdocs/wp-content/plugins/vm-ajax/ /var/www/$domain/htdocs/wp-content/plugins/$customslug/
+			wp $workdir plugin activate $customslug
+			wp $workdir widget delete recent-comments-2 archives-2 categories-2 meta-2
+			wp $workdir widget add text sidebar-1 3 --title="Recent Search" --text="[ks_random_search count=20]"
+			wp $workdir db query "UPDATE wp_options SET option_value = '$blogname' WHERE wp_options.option_name = 'blogname';"
+			wp $workdir db query "UPDATE wp_options SET option_value = '$blogdescription' WHERE wp_options.option_name = 'blogdescription';"
+			wp $workdir db query "UPDATE wp_options SET option_value = '$admin_email' WHERE wp_options.option_name = 'admin_email';"
+			wp $workdir db query "UPDATE wp_options SET option_value = '7' WHERE wp_options.option_name = 'posts_per_page';"
+			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'oss_adf_ly_id', '26948', 'yes');"
+			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'oss_adf_ly_url', '$domain', 'yes');"
+			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'hs_fresh_activation_key', 'FRSHV29821', 'yes');"
+			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_license_active', '$license', 'yes');"
+			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_customslug', '$customslug', 'yes');"
+			EOF
+			[ -f /etc/mvps/wpsetting ] && echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Execute your custom setting ..." && sleep 3s && bash /etc/mvps/wpsetting 
+			echo -e "# \e[30;48;5;82m mVPS v.$version \e[0m # ---- Setting cronjob, to erase VM-GC cache per-minggu ..."
+			sleep 3s
+			[ ! -f /etc/cron.weekly/mvps ] && echo -e "#!/bin/bash\ntgl=\$(date)\n" > /etc/cron.weekly/mvps
+			echo -e "#cronjob for $domain
+			size=\$(du -sh /var/www/$domain/htdocs/wp-content/plugins/$customslug/cache/)
+			echo [\$tgl]-[\$size] >> /etc/mvps/cronjob.log
+			rm -rf /var/www/$domain/htdocs/wp-content/plugins/$customslug/cache/*.cache\n" >> /etc/cron.weekly/mvps
+			echo "------------------------------------------------------------------"
+			echo "Operation success, check : http://$domain"
+			;;
+
+		3 )
+			clear
+			echo -e "\e[40;38;5;82m.::::::::::::::::::-------- \e[30;48;5;82m mVPS v.$version \e[0m \e[40;38;5;82m-------:::::::::::::::::.\e[0m"
+			echo -e "\e[40;38;5;82m------------------------------------------------------------------\e[0m"
+			echo -e "\e[40;38;5;82mBash VPS Wordpress Management, dengan mesin EasyEngine dan WP-CLI\e[0m"
+			echo -e "\e[40;38;5;82m======================= T A S K - L I S T ========================\e[0m"
+			echo "3. Lihat daftar WP Master domain"
+			echo "Yang dibuat Langsung dengan EasyEngine"
+			ee site list
+			echo "------------------------------------------------------------------"
+			echo "Dibuat dengan perantara mVPS ..."
+			nl -b a -s '. ' /etc/mvps/domainMaster.log
+			echo "------------------------------------------------------------------"
+			echo "File log : /etc/mvps/domainMaster.log"
+			;;
+
+		4 )
+			clear
+			echo -e "\e[40;38;5;82m.::::::::::::::::::-------- \e[30;48;5;82m mVPS v.$version \e[0m \e[40;38;5;82m-------:::::::::::::::::.\e[0m"
+			echo -e "\e[40;38;5;82m------------------------------------------------------------------\e[0m"
+			echo -e "\e[40;38;5;82mBash VPS Wordpress Management, dengan mesin EasyEngine dan WP-CLI\e[0m"
+			echo -e "\e[40;38;5;82m======================= T A S K - L I S T ========================\e[0m"
+			echo "4. Hapus domain Master"
+			echo "------------------------------------------------------------------"
+			nl -b a -s '. ' /etc/mvps/domainMaster.log
+			echo "-------------------------------------------------------"
+			echo -n "Nomor domain master yang akan dihapus [isi 1 atau lebih]? "
+			read nomorMaster
+			echo -n "Pastikan pengesian telah benar. Lanjutkan ? [y or n] : "
+			read hapusMasterConf
+			case $hapusMasterConf in
+				[yY] )
+					IFS=',' read -r -a array <<< "$nomorMaster"
+					for master in "${array[@]}"
+					do
+						domainMaster=$(sed "$master!d" /etc/mvps/domainMaster.log | awk -F' ' '$0=$1')
+						echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Deleting $domainMaster ..."
+						sleep 2s
+						ee site delete $domainMaster
+						echo -e "# \e[30;48;5;82m mVPS v.$version \e[0m # ---- Pencarian domain layer yang terhubung di $domainMaster ..."
+					    sleep 2s
+					    chkmasterwp=$(grep "$domainMaster" /etc/mvps/domainLayer.log)
+					    if [ "$chkmasterwp" != "" ]
+					    	then
+					    	echo "------------------------------------------------------------------"
+					    	echo "Daftar domain layer yang terhubung dengan domain $domainMaster"
+					    	echo "------------------------------------------------------------------"
+					    	grep "$domainMaster" /etc/mvps/domainLayer.log | awk -F' ' '$0=$1' | nl -b a -s '. '
+					    	echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Deleting domain layer ..."
+					    	xlayer=$(grep "$domainMaster" /etc/mvps/domainLayer.log | awk -F' ' '$0=$1')
+								while read line
+									do 
+										rm -rf /etc/nginx/sites-enabled/$line
+										rm -rf /etc/nginx/sites-available/$line
+										sed -i "/$line/d" /etc/mvps/domainLayer.log
+										echo -e "# \e[30;48;5;82m mVPS v.$version \e[0m # ---- Domain $line has been deleted ..."
+										sleep 2s 
+								done <<< "$xlayer"
+							else
+							echo "------------------------------------------------------------------"
+					    	echo "Domain layer yang terhubung dengan domain $domainMaster not found."
+					    fi
+					done
+					sudo service nginx restart
+					echo "========================= # \e[30;48;5;82m mVPS v.$version \e[0m # =========================="
+					echo "Task complete, silahkan cek folder dibawah untuk memastikan"
+					echo -e "\t/etc/nginx/sites-enabled/"
+					echo -e "\t/etc/nginx/sites-available/"
+					echo "File log layer : /etc/mvps/domainLayer.log"
+					echo "File log master : /etc/mvps/domainMaster.log"
+					;;
+
+				*) echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Aborted ..."
+					;;
+			esac
+			;;
+
+		5 )
+			clear
+			echo -e "\e[40;38;5;82m.::::::::::::::::::-------- \e[30;48;5;82m mVPS v.$version \e[0m \e[40;38;5;82m-------:::::::::::::::::.\e[0m"
+			echo -e "\e[40;38;5;82m------------------------------------------------------------------\e[0m"
+			echo -e "\e[40;38;5;82mBash VPS Wordpress Management, dengan mesin EasyEngine dan WP-CLI\e[0m"
+			echo -e "\e[40;38;5;82m======================= T A S K - L I S T ========================\e[0m"
+			echo "5. Tambah domain layer"
+			echo "========================= For your Info =========================="
+			echo "#isi domain tanpa http://"
+			echo "#kalo domain layernya banyak, pisahkan dengan koma dan spasi (hi.tk, ho.tk, he.tk)"
+			echo "#Hati-hati dalam pengisian, selalu pastikan sebelum pencet enter"
+			echo "#Karena, tidak diterapkan filter/konfirmasi .. ^_^"
+			echo "------------------------------------------------------------------"
+			[ ! -d /etc/mvps ] && mkdir /etc/mvps
+			echo -n "Domain master [domain WP yg mau dilayer]? "
+			read target
+			echo -n "Domain yang mau dipointing [isi 1 atau lebih]? "
+			read domain
+			echo -n "Pastikan pengesian telah benar. Lanjutkan ? [y or n] : "
+			read layerConf
+				case $layerConf in
+					[yY] )
+						echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Creating layer domain ..."
+						sleep 3s
+						IFS=', ' read -r -a array <<< "$domain"
+						for layer in "${array[@]}"
+						do
+						    echo -e "server {\n\n\tserver_name $layer\twww.$layer;\n\n\taccess_log /var/log/nginx/$layer.access.log rt_cache;\n\terror_log /var/log/nginx/$layer.error.log;\n\n\troot /var/www/$target/htdocs;\n\n\n\tindex index.php index.html index.htm;\n\n\tinclude common/php.conf;\n\tinclude common/wpcommon.conf;\n\tinclude common/locations.conf;\n\tinclude /var/www/$target/conf/nginx/*.conf;\n}" > /etc/nginx/sites-enabled/$layer
+							echo -e "server {\n\n\tserver_name $layer\twww.$layer;\n\n\taccess_log /var/log/nginx/$layer.access.log rt_cache;\n\terror_log /var/log/nginx/$layer.error.log;\n\n\troot /var/www/$target/htdocs;\n\n\n\tindex index.php index.html index.htm;\n\n\tinclude common/php.conf;\n\tinclude common/wpcommon.conf;\n\tinclude common/locations.conf;\n\tinclude /var/www/$target/conf/nginx/*.conf;\n}" > /etc/nginx/sites-available/$layer
+							echo "$layer => $target" >> /etc/mvps/domainLayer.log
+							sleep 2s
+							echo -e "# \e[30;48;5;82m mVPS v.$version \e[0m # domain $layer has been pointed to $target root folder"
+						done
+						sudo service nginx restart
+						chklayerwp=$(grep "define('WP_SITEURL'" /var/www/$target/wp-config.php)
+						if [ "$chklayerwp" == "" ]
+							then
+							echo -e "# \e[30;48;5;82m mVPS v.$version \e[0m # Script multi domain not found in wp-config.php, injecting ..."
+							sleep 3s
+							sed -i "35i /*Handle multi domain*/ define('WP_SITEURL', 'http://' . \$_SERVER['HTTP_HOST']); define('WP_HOME', 'http://' . \$_SERVER['HTTP_HOST']);" /var/www/$target/wp-config.php
+							echo -e "# \e[30;48;5;82m mVPS v.$version \e[0m #Script telah terinject di /var/www/$target/wp-config.php line 35"
+						fi
+						echo "========================= # \e[30;48;5;82m mVPS v.$version \e[0m # =========================="
+						echo "Task complete, silahkan cek folder dibawah untuk memastikan"
+						echo -e "\t/etc/nginx/sites-enabled/"
+						echo -e "\t/etc/nginx/sites-available/"
+						echo "File log layer : /etc/mvps/domainLayer.log"
+						;;
+
+					*) echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Aborted ..."
+						;;
+				esac
+			;;
+		
+		6 )
+			clear
+			echo -e "\e[40;38;5;82m.::::::::::::::::::-------- \e[30;48;5;82m mVPS v.$version \e[0m \e[40;38;5;82m-------:::::::::::::::::.\e[0m"
+			echo -e "\e[40;38;5;82m------------------------------------------------------------------\e[0m"
+			echo -e "\e[40;38;5;82mBash VPS Wordpress Management, dengan mesin EasyEngine dan WP-CLI\e[0m"
+			echo -e "\e[40;38;5;82m======================= T A S K - L I S T ========================\e[0m"
+			echo "6. Lihat daftar domain layer"
+			echo "------------------------------------------------------------------"
+			echo "Layer   =>   Master"
+			echo "------------------------------------------------------------------"
+			nl -b a -s '. ' /etc/mvps/domainLayer.log
+			echo "------------------------------------------------------------------"
+			echo "File log : /etc/mvps/domainLayer.log"
+			;;
+		
+		7 )
+			clear
+			echo -e "\e[40;38;5;82m.::::::::::::::::::-------- \e[30;48;5;82m mVPS v.$version \e[0m \e[40;38;5;82m-------:::::::::::::::::.\e[0m"
+			echo -e "\e[40;38;5;82m------------------------------------------------------------------\e[0m"
+			echo -e "\e[40;38;5;82mBash VPS Wordpress Management, dengan mesin EasyEngine dan WP-CLI\e[0m"
+			echo -e "\e[40;38;5;82m======================= T A S K - L I S T ========================\e[0m"
+			echo "7. Hapus domain layer"
+			echo "------------------------------------------------------------------"
+			echo "Layer   =>   Master"
+			echo "------------------------------------------------------------------"
+			nl -b a -s '. ' /etc/mvps/domainLayer.log
+			echo "-------------------------------------------------------"
+			echo -n "Nomor domain layer yang akan dihapus [isi 1 atau lebih]? "
+			read nomor
+			echo -n "Pastikan pengesian telah benar. Lanjutkan ? [y or n] : "
+			read hapusLayerConf
+			case $hapusLayerConf in
+				[yY] )
+					IFS=', ' read -r -a array <<< "$nomor"
+					for layer in "${array[@]}"
+					do
+						domainLayer=$(sed "$layer!d" /etc/mvps/domainLayer.log | awk -F' ' '$0=$1')
+						echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Deleted $domainLayer ..."
+						sleep 2s
+					    rm -rf /etc/nginx/sites-enabled/$domainLayer
+						rm -rf /etc/nginx/sites-available/$domainLayer
+					done
+					for layer2 in "${array[@]}"
+					do
+						sed -i "$layer2"2 /etc/mvps/domainLayer.log
+					done
+					sudo service nginx restart
+					echo "========================= # \e[30;48;5;82m mVPS v.$version \e[0m # =========================="
+					echo "Task complete, silahkan cek folder dibawah untuk memastikan"
+					echo -e "\t/etc/nginx/sites-enabled/"
+					echo -e "\t/etc/nginx/sites-available/"
+					echo "File log layer : /etc/mvps/domainLayer.log"
+					;;
+
+				*) echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Aborted ..."
+					;;
+			esac
+			;;
+
+		8 )
+			clear
+			echo -e "\e[40;38;5;82m.::::::::::::::::::-------- \e[30;48;5;82m mVPS v.$version \e[0m \e[40;38;5;82m-------:::::::::::::::::.\e[0m"
+			echo -e "\e[40;38;5;82m------------------------------------------------------------------\e[0m"
+			echo -e "\e[40;38;5;82mBash VPS Wordpress Management, dengan mesin EasyEngine dan WP-CLI\e[0m"
+			echo -e "\e[40;38;5;82m======================= T A S K - L I S T ========================\e[0m"
+			echo "8. Cronjob - Log/info cache VM-AGC"
+			echo "------------------------------------------------------------------"
+			echo "========================= Cronjob mvps ==========================="
+			cat /etc/cron.weekly/mvps
+			echo "------------------------------------------------------------------"
+			echo "Cronjob file : /etc/cron.weekly/mvps"
+			echo "------------------------------------------------------------------"
+			echo "======================= Log Cronjob mvps ========================="
+			cat /etc/mvps/cronjob.log
+			echo "------------------------------------------------------------------"
+			echo "Cronjob file : /etc/mvps/cronjob.log"
+			;;
+		
+		9 )
+			clear
+			echo -e "\e[40;38;5;82m.::::::::::::::::::-------- \e[30;48;5;82m mVPS v.$version \e[0m \e[40;38;5;82m-------:::::::::::::::::.\e[0m"
+			echo -e "\e[40;38;5;82m------------------------------------------------------------------\e[0m"
+			echo -e "\e[40;38;5;82mBash VPS Wordpress Management, dengan mesin EasyEngine dan WP-CLI\e[0m"
+			echo -e "\e[40;38;5;82m======================= T A S K - L I S T ========================\e[0m"
+			echo "9. Lihat Account PhpMyAdmin"
+			echo ""
+			cat /etc/mysql/conf.d/my.cnf
+			echo "------------------------------------------------------------------"
+			echo "Check file PhpMyAdmin user auth here : /etc/mysql/conf.d/my.cnf"
+			;;
+
+		10 )
+			clear
+			echo -e "\e[40;38;5;82m.::::::::::::::::::-------- \e[30;48;5;82m mVPS v.$version \e[0m \e[40;38;5;82m-------:::::::::::::::::.\e[0m"
+			echo -e "\e[40;38;5;82m------------------------------------------------------------------\e[0m"
+			echo -e "\e[40;38;5;82mBash VPS Wordpress Management, dengan mesin EasyEngine dan WP-CLI\e[0m"
+			echo -e "\e[40;38;5;82m======================= T A S K - L I S T ========================\e[0m"
+			echo "10. Ubah Default WP User Account"
+			echo ""
+			echo -n "Username : "
+			read EEUsernameIsi
+			echo -n "Password : "
+			read EEPasswordIsi
+			echo -n "E-mail : "
+			read EEEmailIsi
+			echo ""
+			echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Saving Default WP Account ..."
+			sleep 2s
+			sed -i "63d" /etc/ee/ee.conf
+			sed -i "63i user = $EEUsernameIsi" /etc/ee/ee.conf
+			sed -i "66d" /etc/ee/ee.conf
+			sed -i "66i password = $EEPasswordIsi" /etc/ee/ee.conf
+			sed -i "69d" /etc/ee/ee.conf
+			sed -i "69i email = $EEEmailIsi" /etc/ee/ee.conf
+			;;
+
+		11 )
+			clear
+			echo -e "\e[40;38;5;82m.::::::::::::::::::-------- \e[30;48;5;82m mVPS v.$version \e[0m \e[40;38;5;82m-------:::::::::::::::::.\e[0m"
+			echo -e "\e[40;38;5;82m------------------------------------------------------------------\e[0m"
+			echo -e "\e[40;38;5;82mBash VPS Wordpress Management, dengan mesin EasyEngine dan WP-CLI\e[0m"
+			echo -e "\e[40;38;5;82m======================= T A S K - L I S T ========================\e[0m"
+			echo "11. Ubah ExclusiveBot User Account"
+			echo ""
+			[ ! -d /etc/mvps ] && mkdir /etc/mvps
+			[ ! -f /etc/mvps/mvps.conf ] && echo -e "[ ExclusiveBot User Account ]\n\nusername = default\nemail = default\npassword = default" > /etc/mvps/mvps.conf
+			echo -n "Username : "
+			read EBUsernameIsi
+			echo -n "Password : "
+			read EBPasswordIsi
+			echo -n "E-mail : "
+			read EBEmailIsi
+			echo ""
+			echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Saving ExclusiveBot user Account ..."
+			sleep 2s
+			sed -i "3d" /etc/mvps/mvps.conf
+			sed -i "3i username = $EBUsernameIsi" /etc/mvps/mvps.conf
+			sed -i "4d" /etc/mvps/mvps.conf
+			sed -i "4i password = $EBPasswordIsi" /etc/mvps/mvps.conf
+			sed -i "5d" /etc/mvps/mvps.conf
+			sed -i "5i email = $EBEmailIsi" /etc/mvps/mvps.conf
+			echo "------------------------------------------------------------------"
+			echo "mVPS config file here : /etc/mvps/"
+			;;
+
+		12 )
+			clear
+			echo -e "\e[40;38;5;82m.::::::::::::::::::-------- \e[30;48;5;82m mVPS v.$version \e[0m \e[40;38;5;82m-------:::::::::::::::::.\e[0m"
+			echo -e "\e[40;38;5;82m------------------------------------------------------------------\e[0m"
+			echo -e "\e[40;38;5;82mBash VPS Wordpress Management, dengan mesin EasyEngine dan WP-CLI\e[0m"
+			echo "========================== Change Log mVPS ======================="
+			echo "Github : https://github.com/idL3akZ/mvps"
+			echo "------------------------------------------------------------------"
+			echo "#mVPS v3.0"
+			echo "- given name, from untitle to mVPS (ngg penting kan ?) :v"
+			echo "- Add 8 menu option"
+			echo "- Add feature to update script"
+			echo "- Pada opsi install wp + config"
+			echo "  Auto install plugin VM-AGC (ajax version from Ari Artama)"
+			echo "  Auto install plugin STT2, google-sitemap (using WP-CLI)"
+			echo "  Auto change VM-AGC folder name (customslug)"
+			echo "  Auto grab VM-AGC v3.x.x license + inject database (using WP-CLI)"
+			echo "  Auto Default setting for VM-AGC (using WP-CLI)"
+			echo "  Auto inject script multi domain di wp-config jika belum ada"
+			echo "  Auto delete default WP widget (sisa last post dan search"
+			echo "  Add Random Keyword widget from VM-AGC (using WP_CLI)"
+			echo "- Auto schedule to erase VM-AGC cache every week (using cronjob)"
+			echo "- Pada opsi delete master domainMaster"
+			echo "  Auto delete layer domain yang terhubung"
+			echo "- Entah apa lagi, ngg begitu penting juga si ... -_-"
+			echo "------------------------------------------------------------------"
+			echo "#untitle v2.0"
+			echo "- Add option to delete domain layer"
+			echo "- Add option to check daftar domain layer"
+			echo "- Bulk add domain layer"
+			echo "- Bulk delete domain layer"
+			echo "- Add version"
+			echo "------------------------------------------------------------------"
+			echo "#First release, untitle, unVersion"
+			echo "- Option to add domain layer"
+			echo "- Option to inject script multi domain to wp-config.php"
+			;;
+	esac
