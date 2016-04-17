@@ -267,13 +267,14 @@ fi
 			echo "------------------------------------------------------------------"
 			nl -b a -s '. ' /etc/mvps/domainMaster.log
 			echo "-------------------------------------------------------"
+			echo "Pisahkan nomor dengan koma dan spasi contoh 1, 2, 3 ..."
 			echo -n "Nomor domain master yang akan dihapus [isi 1 atau lebih]? "
 			read nomorMaster
 			echo -n "Pastikan pengesian telah benar. Lanjutkan ? [y or n] : "
 			read hapusMasterConf
 			case $hapusMasterConf in
 				[yY] )
-					IFS=',' read -r -a array <<< "$nomorMaster"
+					IFS=', ' read -r -a array <<< "$nomorMaster"
 					for master in "${array[@]}"
 					do
 						domainMaster=$(sed "$master!d" /etc/mvps/domainMaster.log | awk -F' ' '$0=$1')
@@ -327,7 +328,7 @@ fi
 			echo "5. Tambah domain layer"
 			echo "========================= For your Info =========================="
 			echo "#isi domain tanpa http://"
-			echo "#kalo domain layernya banyak, pisahkan dengan koma dan spasi (hi.tk, ho.tk, he.tk)"
+			echo "#kalo domain layernya banyak, pisahkan dengan koma dan spasi (hi.com, ho.com, he.com)"
 			echo "#Hati-hati dalam pengisian, selalu pastikan sebelum pencet enter"
 			echo "#Karena, tidak diterapkan filter/konfirmasi .. ^_^"
 			echo "------------------------------------------------------------------"
@@ -399,6 +400,7 @@ fi
 			echo "------------------------------------------------------------------"
 			nl -b a -s '. ' /etc/mvps/domainLayer.log
 			echo "-------------------------------------------------------"
+			echo "Pisahkan nomor dengan koma dan spasi contoh 1, 2, 3 ..."
 			echo -n "Nomor domain layer yang akan dihapus [isi 1 atau lebih]? "
 			read nomor
 			echo -n "Pastikan pengesian telah benar. Lanjutkan ? [y or n] : "
