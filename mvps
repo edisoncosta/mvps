@@ -147,6 +147,9 @@ fi
 			echo -e "\e[40;38;5;82m------------------------------------------------------------------\e[0m"
 			echo -e "\e[40;38;5;82mBash VPS Wordpress Management, dengan mesin EasyEngine dan WP-CLI\e[0m"
 			echo -e "\e[40;38;5;82m======================= T A S K - L I S T ========================\e[0m"
+			echo "========================= For your Info =========================="
+			echo "#isi domain tanpa http://"
+			echo "------------------------------------------------------------------"
 			echo "2. Wordpress Installation + Default Configuration"
 			[ ! -d /etc/mvps ] && mkdir /etc/mvps
 			echo -n "Isi nama domain : "
@@ -329,8 +332,6 @@ fi
 			echo "========================= For your Info =========================="
 			echo "#isi domain tanpa http://"
 			echo "#kalo domain layernya banyak, pisahkan dengan koma dan spasi (hi.com, ho.com, he.com)"
-			echo "#Hati-hati dalam pengisian, selalu pastikan sebelum pencet enter"
-			echo "#Karena, tidak diterapkan filter/konfirmasi .. ^_^"
 			echo "------------------------------------------------------------------"
 			[ ! -d /etc/mvps ] && mkdir /etc/mvps
 			echo -n "Domain master [domain WP yg mau dilayer]? "
