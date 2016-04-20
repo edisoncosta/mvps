@@ -226,11 +226,20 @@ fi
 			wp $workdir db query "UPDATE wp_options SET option_value = '$blogdescription' WHERE wp_options.option_name = 'blogdescription';"
 			wp $workdir db query "UPDATE wp_options SET option_value = '$admin_email' WHERE wp_options.option_name = 'admin_email';"
 			wp $workdir db query "UPDATE wp_options SET option_value = '7' WHERE wp_options.option_name = 'posts_per_page';"
+			wp $workdir db query "UPDATE wp_options SET option_value = '/%postname%/' WHERE wp_options.option_name = 'permalink_structure';"
 			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'oss_adf_ly_id', '26948', 'yes');"
 			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'oss_adf_ly_url', '$domain', 'yes');"
 			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'hs_fresh_activation_key', 'FRSHV29821', 'yes');"
 			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_license_active', '$license', 'yes');"
 			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_customslug', '$customslug', 'yes');"
+			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_gallery_image_num', '3', 'yes');"
+			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_show_related', 'true', 'yes');"
+			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_show_agc_text', 'true', 'yes');"
+			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_show_cse', 'true', 'yes');"
+			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_inject_sitemap', 'true', 'yes');"
+			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_size', 'MEDIUM', 'yes');"
+			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_404_keyword', 'null, query, bing, yahoo, yandex, baidu', 'yes');"
+			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'disable_comments_options', 'a:5:{s:19:"disabled_post_types";a:3:{i:0;s:4:"post";i:1;s:4:"page";i:2;s:10:"attachment";}s:17:"remove_everywhere";b:0;s:9:"permanent";b:0;s:16:"extra_post_types";b:0;s:10:"db_version";i:6;}', 'yes');"
 			EOF
 			[ -f /etc/mvps/wpsetting ] && echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Execute your custom setting ..." && sleep 3s && bash /etc/mvps/wpsetting 
 			echo -e "# \e[30;48;5;82m mVPS v.$version \e[0m # ---- Setting cronjob, to erase VM-GC cache per-minggu ..."
@@ -307,6 +316,11 @@ fi
 							echo "------------------------------------------------------------------"
 					    	echo "Domain layer yang terhubung dengan domain $domainMaster not found."
 					    fi
+					    echo -e "# \e[30;48;5;82m mVPS v.$version \e[0m # ---- Hapus cronjob untuk $domainMaster ..."
+					    sleep 3s
+					    firstLine=$(grep -n "#cronjob for $domainMaster" /etc/cron.weekly/mvps | awk -F':' '$0=$1')
+					    endLine=$(expr $firstLine + 4)
+					    sed -i "$firstLine","$endLine"d /etc/cron.weekly/mvps
 					done
 					sudo service nginx restart
 					echo "========================= # \e[30;48;5;82m mVPS v.$version \e[0m # =========================="
