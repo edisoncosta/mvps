@@ -1,7 +1,7 @@
 #!/bin/bash
 # ============== INFO SCRIPT =============
-version="3.0"
-changelog="Mayor update, add more task and feature"
+version="3.0.1"
+changelog="Important Update, bug fixing ..."
 urlscript="https://raw.githubusercontent.com/idL3akZ/mvps/master/mvps"
 ver=$(wget -qO- --no-check-certificate $urlscript | sed '3!d' | awk -F'"' '$0=$2')
 vlog=$(wget -qO- --no-check-certificate $urlscript | sed '4!d' | awk -F'"' '$0=$2')
@@ -176,15 +176,15 @@ fi
 				read saveEB
 					case $saveEB in
 						[yY] )
-							echo -e "[ ExclusiveBot User Account ]\n\nusername = default\nemail = default\npassword = default" > /etc/mvps/mvps.conf
+							echo -e "[ ExclusiveBot User Account ]\n\nusername = default\npassword = default\nemail = default" > /etc/mvps/mvps.conf
 							echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Saving ExclusiveBot user Account ..."
 							sleep 2s
-							sed -i "3d" /etc/mvps/mvps.conf
 							sed -i "3i username = $EBUsernameIsi" /etc/mvps/mvps.conf
 							sed -i "4d" /etc/mvps/mvps.conf
 							sed -i "4i password = $EBPasswordIsi" /etc/mvps/mvps.conf
 							sed -i "5d" /etc/mvps/mvps.conf
 							sed -i "5i email = $EBEmailIsi" /etc/mvps/mvps.conf
+							sed -i "6d" /etc/mvps/mvps.conf
 							echo "------------------------------------------------------------------"
 							echo "mVPS config file here : /etc/mvps/"
 							;;
@@ -289,21 +289,21 @@ fi
 					IFS=', ' read -r -a array <<< "$nomorMaster"
 					for master in "${array[@]}"
 					do
-						domainMaster=$(sed "$master!d" /etc/mvps/domainMaster.log | awk -F' ' '$0=$1')
-						echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Deleting $domainMaster ..."
+						domainMaster_[$master]=$(sed "$master"'!d' /etc/mvps/domainMaster.log | awk -F' ' '$0=$1')
+						echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Deleting ${domainMaster_[$master]} ..."
 						sleep 2s
-						ee site delete $domainMaster
-						echo -e "# \e[30;48;5;82m mVPS v.$version \e[0m # ---- Pencarian domain layer yang terhubung di $domainMaster ..."
+						ee site delete ${domainMaster_[$master]}
+						echo -e "# \e[30;48;5;82m mVPS v.$version \e[0m # ---- Pencarian domain layer yang terhubung di ${domainMaster_[$master]} ..."
 					    sleep 2s
-					    chkmasterwp=$(grep "$domainMaster" /etc/mvps/domainLayer.log)
+					    chkmasterwp=$(grep "${domainMaster_[$master]}" /etc/mvps/domainLayer.log)
 					    if [ "$chkmasterwp" != "" ]
 					    	then
 					    	echo "------------------------------------------------------------------"
-					    	echo "Daftar domain layer yang terhubung dengan domain $domainMaster"
+					    	echo "Daftar domain layer yang terhubung dengan domain ${domainMaster_[$master]}"
 					    	echo "------------------------------------------------------------------"
-					    	grep "$domainMaster" /etc/mvps/domainLayer.log | awk -F' ' '$0=$1' | nl -b a -s '. '
+					    	grep "${domainMaster_[$master]}" /etc/mvps/domainLayer.log | awk -F' ' '$0=$1' | nl -b a -s '. '
 					    	echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Deleting domain layer ..."
-					    	xlayer=$(grep "$domainMaster" /etc/mvps/domainLayer.log | awk -F' ' '$0=$1')
+					    	xlayer=$(grep "${domainMaster_[$master]}" /etc/mvps/domainLayer.log | awk -F' ' '$0=$1')
 								while read line
 									do 
 										rm -rf /etc/nginx/sites-enabled/$line
@@ -314,13 +314,18 @@ fi
 								done <<< "$xlayer"
 							else
 							echo "------------------------------------------------------------------"
-					    	echo "Domain layer yang terhubung dengan domain $domainMaster not found."
+					    	echo "Domain layer yang terhubung dengan domain ${domainMaster_[$master]} not found."
 					    fi
-					    echo -e "# \e[30;48;5;82m mVPS v.$version \e[0m # ---- Hapus cronjob untuk $domainMaster ..."
+					    echo -e "# \e[30;48;5;82m mVPS v.$version \e[0m # ---- Hapus cronjob untuk ${domainMaster_[$master]} ..."
 					    sleep 3s
-					    firstLine=$(grep -n "#cronjob for $domainMaster" /etc/cron.weekly/mvps | awk -F':' '$0=$1')
+					    firstLine=$(grep -n "#cronjob for ${domainMaster_[$master]}" /etc/cron.weekly/mvps | awk -F':' '$0=$1')
 					    endLine=$(expr $firstLine + 4)
 					    sed -i "$firstLine","$endLine"d /etc/cron.weekly/mvps
+					done
+					IFS=', ' read -r -a array <<< "$nomorMaster"
+					for master in "${array[@]}"
+					do
+						sed -i "/${domainMaster_[$master]}/d" /etc/mvps/domainMaster.log
 					done
 					sudo service nginx restart
 					echo "========================= # \e[30;48;5;82m mVPS v.$version \e[0m # =========================="
@@ -344,6 +349,8 @@ fi
 			echo -e "\e[40;38;5;82m======================= T A S K - L I S T ========================\e[0m"
 			echo "5. Tambah domain layer"
 			echo "========================= For your Info =========================="
+			ee site list
+			echo "------------------------------------------------------------------"
 			echo "#isi domain tanpa http://"
 			echo "#kalo domain layernya banyak, pisahkan dengan koma dan spasi (hi.com, ho.com, he.com)"
 			echo "------------------------------------------------------------------"
@@ -376,7 +383,7 @@ fi
 							sed -i "35i /*Handle multi domain*/ define('WP_SITEURL', 'http://' . \$_SERVER['HTTP_HOST']); define('WP_HOME', 'http://' . \$_SERVER['HTTP_HOST']);" /var/www/$target/wp-config.php
 							echo -e "# \e[30;48;5;82m mVPS v.$version \e[0m #Script telah terinject di /var/www/$target/wp-config.php line 35"
 						fi
-						echo "========================= # \e[30;48;5;82m mVPS v.$version \e[0m # =========================="
+						echo -e "========================= # \e[30;48;5;82m mVPS v.$version \e[0m # =========================="
 						echo "Task complete, silahkan cek folder dibawah untuk memastikan"
 						echo -e "\t/etc/nginx/sites-enabled/"
 						echo -e "\t/etc/nginx/sites-available/"
@@ -425,18 +432,19 @@ fi
 					IFS=', ' read -r -a array <<< "$nomor"
 					for layer in "${array[@]}"
 					do
-						domainLayer=$(sed "$layer!d" /etc/mvps/domainLayer.log | awk -F' ' '$0=$1')
-						echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Deleted $domainLayer ..."
+						domainLayer_[$layer]=$(sed "$layer"'!d' /etc/mvps/domainLayer.log | awk -F' ' '$0=$1')
+						echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Deleted ${domainLayer_[$layer]} ..."
 						sleep 2s
-					    rm -rf /etc/nginx/sites-enabled/$domainLayer
-						rm -rf /etc/nginx/sites-available/$domainLayer
+					    rm -rf /etc/nginx/sites-enabled/${domainLayer_[$layer]}
+						rm -rf /etc/nginx/sites-available/${domainLayer_[$layer]}
 					done
-					for layer2 in "${array[@]}"
+					IFS=', ' read -r -a array <<< "$nomor"
+					for layer in "${array[@]}"
 					do
-						sed -i "$layer2"2 /etc/mvps/domainLayer.log
+						sed -i "/${domainLayer_[$layer]}/d" /etc/mvps/domainLayer.log
 					done
 					sudo service nginx restart
-					echo "========================= # \e[30;48;5;82m mVPS v.$version \e[0m # =========================="
+					echo -e "========================= # \e[30;48;5;82m mVPS v.$version \e[0m # =========================="
 					echo "Task complete, silahkan cek folder dibawah untuk memastikan"
 					echo -e "\t/etc/nginx/sites-enabled/"
 					echo -e "\t/etc/nginx/sites-available/"
@@ -514,7 +522,7 @@ fi
 			echo "11. Ubah ExclusiveBot User Account"
 			echo ""
 			[ ! -d /etc/mvps ] && mkdir /etc/mvps
-			[ ! -f /etc/mvps/mvps.conf ] && echo -e "[ ExclusiveBot User Account ]\n\nusername = default\nemail = default\npassword = default" > /etc/mvps/mvps.conf
+			[ ! -f /etc/mvps/mvps.conf ] && echo -e "[ ExclusiveBot User Account ]\n\nusername = default\npassword = default\nemail = default" > /etc/mvps/mvps.conf
 			echo -n "Username : "
 			read EBUsernameIsi
 			echo -n "Password : "
@@ -524,12 +532,12 @@ fi
 			echo ""
 			echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Saving ExclusiveBot user Account ..."
 			sleep 2s
-			sed -i "3d" /etc/mvps/mvps.conf
 			sed -i "3i username = $EBUsernameIsi" /etc/mvps/mvps.conf
 			sed -i "4d" /etc/mvps/mvps.conf
 			sed -i "4i password = $EBPasswordIsi" /etc/mvps/mvps.conf
 			sed -i "5d" /etc/mvps/mvps.conf
 			sed -i "5i email = $EBEmailIsi" /etc/mvps/mvps.conf
+			sed -i "6d" /etc/mvps/mvps.conf
 			echo "------------------------------------------------------------------"
 			echo "mVPS config file here : /etc/mvps/"
 			;;
