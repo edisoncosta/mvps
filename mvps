@@ -227,6 +227,7 @@ fi
 			wp $workdir db query "UPDATE wp_options SET option_value = '$admin_email' WHERE wp_options.option_name = 'admin_email';"
 			wp $workdir db query "UPDATE wp_options SET option_value = '7' WHERE wp_options.option_name = 'posts_per_page';"
 			wp $workdir db query "UPDATE wp_options SET option_value = '/%postname%/' WHERE wp_options.option_name = 'permalink_structure';"
+			wp $workdir db query "UPDATE wp_options SET option_value = 'a:5:{s:19:"disabled_post_types";a:3:{i:0;s:4:"post";i:1;s:4:"page";i:2;s:10:"attachment";}s:17:"remove_everywhere";b:0;s:9:"permanent";b:0;s:16:"extra_post_types";b:0;s:10:"db_version";i:6;}' WHERE wp_options.option_name = 'disable_comments_options';"
 			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'oss_adf_ly_id', '26948', 'yes');"
 			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'oss_adf_ly_url', '$domain', 'yes');"
 			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'hs_fresh_activation_key', 'FRSHV29821', 'yes');"
@@ -239,7 +240,19 @@ fi
 			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_inject_sitemap', 'true', 'yes');"
 			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_size', 'MEDIUM', 'yes');"
 			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_404_keyword', 'null, query, bing, yahoo, yandex, baidu', 'yes');"
-			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'disable_comments_options', 'a:5:{s:19:"disabled_post_types";a:3:{i:0;s:4:"post";i:1;s:4:"page";i:2;s:10:"attachment";}s:17:"remove_everywhere";b:0;s:9:"permanent";b:0;s:16:"extra_post_types";b:0;s:10:"db_version";i:6;}', 'yes');"
+			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_template', '[title]
+			[first-images]
+			[agc-text]
+			[images-galery]
+			[spun-text]
+			[related-post]
+			[google-cse]''
+			, 'yes');"
+			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_image_gallery_text', 'Images Of [title]', 'yes');"
+			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_gallery_image_width', '150', 'yes');"
+			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_gallery_image_height', '150', 'yes');"
+			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_related_post_text', 'Related Post Of [title]', 'yes');"
+			wp $workdir db query "INSERT INTO wp_options (option_id, option_name, option_value, autoload) VALUES (NULL, 'vmagc_brokenlink_img', 'http://$domain/wp-content/plugins/$customslug/assets/img/not-available.jpg', 'yes');"
 			EOF
 			[ -f /etc/mvps/wpsetting ] && echo -e "###### \e[30;48;5;82m mVPS v.$version \e[0m ##### ---- Execute your custom setting ..." && sleep 3s && bash /etc/mvps/wpsetting 
 			echo -e "# \e[30;48;5;82m mVPS v.$version \e[0m # ---- Setting cronjob, to erase VM-GC cache per-minggu ..."
@@ -249,6 +262,13 @@ fi
 			size=\$(du -sh /var/www/$domain/htdocs/wp-content/plugins/$customslug/cache/)
 			echo [\$tgl]-[\$size] >> /etc/mvps/cronjob.log
 			rm -rf /var/www/$domain/htdocs/wp-content/plugins/$customslug/cache/*.cache\n" >> /etc/cron.weekly/mvps
+			echo -e "# \e[30;48;5;82m mVPS v.$version \e[0m # ---- Setting server conf, for sitemap ..."
+			sleep 3s
+			sed -i '13i rewrite ^/sitemap(-+([a-zA-Z0-9_-]+))?\.xml$ "/index.php?xml_sitemap=params=$2" last;' /etc/nginx/sites-enabled/$domain
+			sed -i '14i rewrite ^/sitemap(-+([a-zA-Z0-9_-]+))?\.xml\.gz$ "/index.php?xml_sitemap=params=$2;zip=true" last;' /etc/nginx/sites-enabled/$domain
+			sed -i '15i rewrite ^/sitemap(-+([a-zA-Z0-9_-]+))?\.html$ "/index.php?xml_sitemap=params=$2;html=true" last;' /etc/nginx/sites-enabled/$domain
+			sed -i '16i rewrite ^/sitemap(-+([a-zA-Z0-9_-]+))?\.html.gz$ "/index.php?xml_sitemap=params=$2;html=true;zip=true" last;' /etc/nginx/sites-enabled/$domain
+			sudo service nginx restart
 			echo "------------------------------------------------------------------"
 			echo "Operation success, check : http://$domain"
 			;;
@@ -328,7 +348,7 @@ fi
 						sed -i "/${domainMaster_[$master]}/d" /etc/mvps/domainMaster.log
 					done
 					sudo service nginx restart
-					echo "========================= # \e[30;48;5;82m mVPS v.$version \e[0m # =========================="
+					echo -e "========================= # \e[30;48;5;82m mVPS v.$version \e[0m # =========================="
 					echo "Task complete, silahkan cek folder dibawah untuk memastikan"
 					echo -e "\t/etc/nginx/sites-enabled/"
 					echo -e "\t/etc/nginx/sites-available/"
@@ -368,8 +388,8 @@ fi
 						IFS=', ' read -r -a array <<< "$domain"
 						for layer in "${array[@]}"
 						do
-						    echo -e "server {\n\n\tserver_name $layer\twww.$layer;\n\n\taccess_log /var/log/nginx/$layer.access.log rt_cache;\n\terror_log /var/log/nginx/$layer.error.log;\n\n\troot /var/www/$target/htdocs;\n\n\n\tindex index.php index.html index.htm;\n\n\tinclude common/php.conf;\n\tinclude common/wpcommon.conf;\n\tinclude common/locations.conf;\n\tinclude /var/www/$target/conf/nginx/*.conf;\n}" > /etc/nginx/sites-enabled/$layer
-							echo -e "server {\n\n\tserver_name $layer\twww.$layer;\n\n\taccess_log /var/log/nginx/$layer.access.log rt_cache;\n\terror_log /var/log/nginx/$layer.error.log;\n\n\troot /var/www/$target/htdocs;\n\n\n\tindex index.php index.html index.htm;\n\n\tinclude common/php.conf;\n\tinclude common/wpcommon.conf;\n\tinclude common/locations.conf;\n\tinclude /var/www/$target/conf/nginx/*.conf;\n}" > /etc/nginx/sites-available/$layer
+						    echo -e '\nserver {\n\n\n\tserver_name '"$layer"'\twww.'"$layer"';\n\n\n\taccess_log /var/log/nginx/'"$layer"'.access.log rt_cache;\n\terror_log /var/log/nginx/'"$layer"'.error.log;\n\n\n\troot /var/www/'"$target"'/htdocs;\n\trewrite ^/sitemap(-+([a-zA-Z0-9_-]+))?\.xml$ "/index.php?xml_sitemap=params=$2" last;\n\trewrite ^/sitemap(-+([a-zA-Z0-9_-]+))?\.xml\.gz$ "/index.php?xml_sitemap=params=$2;zip=true" last;\n\trewrite ^/sitemap(-+([a-zA-Z0-9_-]+))?\.html$ "/index.php?xml_sitemap=params=$2;html=true" last;\n\trewrite ^/sitemap(-+([a-zA-Z0-9_-]+))?\.html.gz$ "/index.php?xml_sitemap=params=$2;html=true;zip=true" last;\n\n\n\n\tindex index.php index.html index.htm;\n\n\n\tinclude common/php.conf;\n\tinclude common/wpcommon.conf;\n\tinclude common/locations.conf;\n\tinclude /var/www/'"$target"'/conf/nginx/*.conf;\n}' > /etc/nginx/sites-enabled/$layer
+							echo -e '\nserver {\n\n\n\tserver_name '"$layer"'\twww.'"$layer"';\n\n\n\taccess_log /var/log/nginx/'"$layer"'.access.log rt_cache;\n\terror_log /var/log/nginx/'"$layer"'.error.log;\n\n\n\troot /var/www/'"$target"'/htdocs;\n\trewrite ^/sitemap(-+([a-zA-Z0-9_-]+))?\.xml$ "/index.php?xml_sitemap=params=$2" last;\n\trewrite ^/sitemap(-+([a-zA-Z0-9_-]+))?\.xml\.gz$ "/index.php?xml_sitemap=params=$2;zip=true" last;\n\trewrite ^/sitemap(-+([a-zA-Z0-9_-]+))?\.html$ "/index.php?xml_sitemap=params=$2;html=true" last;\n\trewrite ^/sitemap(-+([a-zA-Z0-9_-]+))?\.html.gz$ "/index.php?xml_sitemap=params=$2;html=true;zip=true" last;\n\n\n\n\tindex index.php index.html index.htm;\n\n\n\tinclude common/php.conf;\n\tinclude common/wpcommon.conf;\n\tinclude common/locations.conf;\n\tinclude /var/www/'"$target"'/conf/nginx/*.conf;\n}' > /etc/nginx/sites-available/$layer
 							echo "$layer => $target" >> /etc/mvps/domainLayer.log
 							sleep 2s
 							echo -e "# \e[30;48;5;82m mVPS v.$version \e[0m # domain $layer has been pointed to $target root folder"
@@ -549,6 +569,10 @@ fi
 			echo -e "\e[40;38;5;82mBash VPS Wordpress Management, dengan mesin EasyEngine dan WP-CLI\e[0m"
 			echo "========================== Change Log mVPS ======================="
 			echo "Github : https://github.com/idL3akZ/mvps"
+			echo "------------------------------------------------------------------"
+			echo "#mVPS v3.0.1"
+			echo "- Bug fixing : hapus log"
+			echo "- Setting rewrite rule untuk sitemap ke config server"
 			echo "------------------------------------------------------------------"
 			echo "#mVPS v3.0"
 			echo "- given name, from untitle to mVPS (ngg penting kan ?) :v"
